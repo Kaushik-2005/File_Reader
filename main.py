@@ -54,7 +54,6 @@ def get_conversational_chain():
     Answer the question as detailed as possible from the provided context. If the answer is not in the provided context, just say, "The answer is not available in the context," and don't provide a wrong answer.
     Context: \n {context}\n
     Question: \n{question}\n
-
     Answer:
     """
     model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.3)
@@ -95,42 +94,79 @@ def clear_conversation():
     st.success("Conversation history cleared.")
 
 
+# Chatbot function similar to bot.py
+def start_chatbot():
+    if 'chat_history' not in st.session_state:
+        st.session_state.chat_history = []
+    if "chat_session" not in st.session_state:
+        st.session_state.chat_session = genai.GenerativeModel('gemini-pro').start_chat(history=[])
+
+    def translate_role_for_streamlit(user_role):
+        return "assistant" if user_role == "model" else user_role
+
+    st.title("Gemini-Chatbot")
+
+    for message in st.session_state.chat_session.history:
+        with st.chat_message(translate_role_for_streamlit(message.role)):
+            st.markdown(message.parts[0].text)
+
+    user_prompt = st.chat_input("Ask Gemini-Pro...")
+    if user_prompt:
+        st.chat_message("user").markdown(user_prompt)
+        st.session_state.chat_history.append(f"You: {user_prompt}")
+
+        gemini_response = st.session_state.chat_session.send_message(user_prompt)
+        st.session_state.chat_history.append(f"Assistant: {gemini_response.text}")
+
+        with st.chat_message("assistant"):
+            st.markdown(gemini_response.text)
+
+
 # Main function to run the app
 def main():
-    st.title("Conversational Study Assistant")
-
-    # Sidebar for document upload and processing
+    # Sidebar for navigation
     with st.sidebar:
         st.title("Menu")
-        pdf_docs = st.file_uploader("Upload your PDF Files", accept_multiple_files=True)
-        if st.button("Submit & Process"):
-            if pdf_docs:
-                with st.spinner("Processing..."):
-                    raw_text = get_pdf_text(pdf_docs)
-                    text_chunks = get_text_chunks(raw_text)
-                    get_vector_store(text_chunks)
-                    st.success("Processing complete.")
-            else:
-                st.error("Please upload at least one PDF file.")
+
+        # Select between Study Assistant and Chatbot
+        mode = st.radio("Choose Mode", ("PDF qna bot", "Chatbot"))
 
         # Clear conversation history button
-        st.sidebar.button('Clear Conversation History', on_click=clear_conversation)
+        st.button('Clear Conversation History', on_click=clear_conversation)
 
         # Option to download the conversation history
         if 'conversation_history' in st.session_state:
             chat_history_str = "\n".join([f"You: {q}\nBot: {a}" for q, a in st.session_state['conversation_history']])
-            st.sidebar.download_button(
+            st.download_button(
                 label="Download chat",
                 data=chat_history_str,
                 file_name="chat_history.txt",
                 mime="text/plain"
             )
 
-    # Chat UI
-    st.subheader("Ask a Question")
-    user_question = st.chat_input("Type your question here...")
-    if user_question:
-        handle_user_input(user_question)
+    # Conditional content based on the mode selected
+    if mode == "Chatbot":
+        start_chatbot()
+    elif mode == "PDF qna bot":
+        st.title("PDF qna Assistant")
+
+        # Sidebar options specific to Study Assistant
+        with st.sidebar:
+            pdf_docs = st.file_uploader("Upload your PDF Files", accept_multiple_files=True)
+            if st.button("Submit & Process"):
+                if pdf_docs:
+                    with st.spinner("Processing..."):
+                        raw_text = get_pdf_text(pdf_docs)
+                        text_chunks = get_text_chunks(raw_text)
+                        get_vector_store(text_chunks)
+                        st.success("Processing complete.")
+                else:
+                    st.error("Please upload at least one PDF file.")
+
+        st.subheader("Ask a Question")
+        user_question = st.chat_input("Type your question here...")
+        if user_question:
+            handle_user_input(user_question)
 
 
 if __name__ == "__main__":
