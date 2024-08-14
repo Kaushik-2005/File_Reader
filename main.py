@@ -23,6 +23,54 @@ st.set_page_config(
     layout="centered",
 )
 
+# Custom CSS
+st.markdown("""
+            <style>
+                .sidebar .sidebar-content{
+                    padding-top: 2rem;
+                }
+                .stRadio > div {
+                    display: flex;
+                    justify-content: center;
+                    gap: 10px;
+                    background-color: #2c3f33;
+                    padding: 10px;
+                    border-radius: 8px;
+                }
+                .stRadio > div label{
+                    font-size: 1rem;
+                    font-weight: bold;
+                    color: white;
+                }
+                .stButton button{
+                    background-color: #7289da;
+                    color: white;
+                    border: none;
+                    padding: 0.5rem 1rem;
+                    border-radius: 8px;
+                    font-size: 1rem;
+                    width: 100%;
+                    cursor: pointer;
+                    margin-bottom: 10px;
+                }
+                .stButton button:hover{
+                    background-color: #5b6eae;
+                }
+                .stDownloadButton button:hover {
+                    background-color: #7e8b99;
+                }
+                .css-1l02zno {
+                    padding: 1rem;
+                }
+                .css-1aumxhk {
+                    padding-top: 1rem;
+                }
+                .stFileUploader label {
+                    font-weight: bold;
+                    color: white;
+                }
+            </style>
+        """, unsafe_allow_html= True)
 
 # Function to extract text from PDFs
 def get_pdf_text(pdf_docs):
