@@ -70,7 +70,7 @@ st.markdown("""
                     color: white;
                 }
             </style>
-        """, unsafe_allow_html= True)
+        """, unsafe_allow_html=True)
 
 # Function to extract text from PDFs
 def get_pdf_text(pdf_docs):
@@ -81,20 +81,17 @@ def get_pdf_text(pdf_docs):
             text += page.extract_text()
     return text
 
-
 # Function to split the text into chunks for processing
 def get_text_chunks(text):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=10000, chunk_overlap=1000)
     chunks = text_splitter.split_text(text)
     return chunks
 
-
 # Function to create a vector store from text chunks
 def get_vector_store(text_chunks):
     embeddings = GoogleGenerativeAIEmbeddings(model='models/embedding-001')
     vector_store = FAISS.from_texts(text_chunks, embedding=embeddings)
     vector_store.save_local('faiss_index')
-
 
 # Function to create a conversational chain for question answering
 def get_conversational_chain():
@@ -108,7 +105,6 @@ def get_conversational_chain():
     prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
     chain = load_qa_chain(model, chain_type='stuff', prompt=prompt)
     return chain
-
 
 # Function to handle user input and generate a response
 def handle_user_input(user_question):
@@ -135,12 +131,11 @@ def handle_user_input(user_question):
         with st.chat_message("assistant"):
             st.markdown(f"**Bot:** {answer}")
 
-
 # Function to clear the conversation history
 def clear_conversation():
-    st.session_state['conversation_history'] = []
-    st.success("Conversation history cleared.")
-
+    st.session_state['conversation_history'] = []  # Clear history
+    st.session_state.chat_session = genai.GenerativeModel('gemini-pro').start_chat(history=[])  # Start a new chat session
+    st.experimental_rerun()  # Rerun the app to refresh the state
 
 # Chatbot function similar to bot.py
 def start_chatbot():
@@ -168,7 +163,6 @@ def start_chatbot():
 
         with st.chat_message("assistant"):
             st.markdown(gemini_response.text)
-
 
 # Main function to run the app
 def main():
@@ -215,7 +209,6 @@ def main():
         user_question = st.chat_input("Type your question here...")
         if user_question:
             handle_user_input(user_question)
-
 
 if __name__ == "__main__":
     main()
