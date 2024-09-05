@@ -1,4 +1,4 @@
-# Conversational Study Assistant
+# File Analyzer
 
 This project is built to build a bot that can analyze various files and answer any queries related to them. By the time of finishing the bot will be able to read and analyze files like `.txt`, `.docx`, `.csv`, `.pdf` and, etc. I have used Google's Gemini and used langchain framework for building this application. 
 
