@@ -31,7 +31,7 @@ This project is built to build a bot that can analyze various files and answer a
 ### Steps
 1. **Clone the Repository:**
    ```bash
-   git clone https://github.com/your-repo/conversational-study-assistant.git
+   git clone https://github.com/Kaushik-2005/File_Reader.git
    cd conversational-study-assistant
 2. **Install Dependencies:**
    ```bash
